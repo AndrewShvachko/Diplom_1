@@ -37,18 +37,25 @@ class TestBurger:
          with pytest.raises(AttributeError):
               burger.get_receipt()            
     
-    def test_get_receipt_shows_bun_name(self, ready_burger, bun):
-         receipt = ready_burger.get_receipt()
-         assert bun.get_name() in receipt
+    def test_get_receipt_shows_bun_name(self, ready_burger, bun):         
+         receipt = ready_burger.get_receipt()         
+         assert receipt.count(f'(==== {bun.get_name()} ====)') == 2
          
     def test_get_receipt_shows_ingredient_name(self, ready_burger, ingredient):
          receipt = ready_burger.get_receipt()
-         assert ingredient.get_name() in receipt
+         lines = receipt.split('\n')
+         expected_ingredient_line = f'= {ingredient.get_type().lower()} {ingredient.get_name()} ='
+         assert lines[1] == expected_ingredient_line
 
     def test_get_receipt_no_ingredients(self, burger, bun):
          burger.set_buns(bun)
          receipt = burger.get_receipt()
-         assert receipt.count(bun.get_name()) == 2
+         lines = receipt.split('\n')
+         assert len(lines) == 4
+         assert lines[0] == f'(==== {bun.get_name()} ====)'
+         assert lines[1] == f'(==== {bun.get_name()} ====)'
+         assert lines[2] == '' 
+         assert lines[3].startswith('Price: ')
 
     def test_get_price_with_different_combinations(self, ready_burger, bun, ingredient):
          expected_price = bun.get_price() * 2 + ingredient.get_price()
@@ -56,6 +63,8 @@ class TestBurger:
 
     def test_get_receipt_shows_ingredient_type(self, ready_burger, ingredient):
          receipt = ready_burger.get_receipt()
-         assert ingredient.get_type().lower() in receipt
+         lines = receipt.split('\n')
+         expected_ingredient_line = f'= {ingredient.get_type().lower()} {ingredient.get_name()} ='
+         assert lines[1] == expected_ingredient_line
                         
   
